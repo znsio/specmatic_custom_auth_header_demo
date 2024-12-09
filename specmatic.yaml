@@ -1,0 +1,6 @@
+sources:
+  - provider: filesystem
+    provides:
+      - spec.yaml
+    consumes:
+      - spec.yaml

@@ -1,0 +1,133 @@
+openapi: 3.0.3
+info:
+  title: Customer Order Entry API
+  description: API for reserving phone numbers and retrieving reservation details.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+components:
+  securitySchemes:
+    MicroToken:
+      type: apiKey
+      in: header
+      name: X-Microtoken
+  schemas:
+    PhoneNumberReservationRequest:
+      type: object
+      properties:
+        externalId:
+          type: string
+          format: uuid
+          example: "9ad51b37-1cba-4e14-920e-c92a22874cd1"
+        numberReservation:
+          type: object
+          example: {}
+    PhoneNumberReservationResponse:
+      type: object
+      properties:
+        reservationId:
+          type: string
+          example: "abc123"
+        status:
+          type: string
+          example: "reserved"
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Invalid request"
+security:
+  - MicroToken: [] 
+paths:
+  /v1/customer-order-entry/service-setup/reservePhoneNumber:
+    post:
+      summary: Reserve a phone number
+      description: Reserves a phone number based on the provided request body.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhoneNumberReservationRequest'
+      responses:
+        200:
+          description: Phone number reserved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhoneNumberReservationResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - MicroToken: []
+      parameters:
+        - name: X-Channel
+          in: header
+          required: true
+          schema:
+            type: string
+          example: retail
+        - name: X-Source-System
+          in: header
+          required: true
+          schema:
+            type: string
+          example: JEDJW
+        - name: X-Correlation-Id
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 4f3b8304-1b86-4964-8f53-d9dd396c4140
+        - name: X-DS-Correlation-Id
+          in: header
+          required: true
+          schema:
+            type: string
+          example: a95d4866-20f8-45eb-b3fc-adc2a111a564
+  /v1/customer-order-entry/service-setup/getReservationStatus:
+    get:
+      summary: Get phone number reservation status
+      description: Retrieves the status of a phone number reservation.
+      parameters:
+        - name: externalId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "9ad51b37-1cba-4e14-920e-c92a22874cd1"
+        - name: X-Correlation-Id
+          in: header
+          required: true
+          schema:
+            type: string
+          example: 4f3b8304-1b86-4964-8f53-d9dd396c4140
+        - name: X-DS-Correlation-Id
+          in: header
+          required: true
+          schema:
+            type: string
+          example: a95d4866-20f8-45eb-b3fc-adc2a111a564
+      responses:
+        200:
+          description: Reservation status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhoneNumberReservationResponse'
+        404:
+          description: Reservation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - MicroToken: []
+
